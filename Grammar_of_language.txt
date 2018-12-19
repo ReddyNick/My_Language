@@ -1,0 +1,51 @@
+//no types
+//automatic declaration
+// очистить_от or minus can be on the first place, so modify  <expr> or <id>
+
+<program>    ::= "Рецепт, '"', <name of programm>, '"', [<premain>], <main>;
+
+<premain> ::= [<assign> ';'], "Порядок приготовления:", [<func_defenition>+];
+
+<main> ::= "ВРУБИТЬ МУЗОН!", {<statment>},
+           "ВЫРУБИТЬ МУЗОН!", "Время приготовления" <const> "мин";
+
+<statements> ::= {<statment>}
+
+<statement> ::= <if_stmt> | <while_stmt> | <expr>';' | <output> | <input>
+                <return> |<assign>;
+
+<return> ::= "наТарелку";
+<expr>     ::= <just expression>;
+
+<assign> ::= "ингридиенты:", <id>["="<just expression>]{,<id>["="<just expression>]},";";
+<term>     ::= <id> | <const> | <function_call>;
+
+<if_stmt> ::= "дегустация", "(", <expr>, ")", (<statment> | "позвать_повара:" {<statment>} "отослать_п.")
+		["else",  (<statment> | "позвать_повара "{<statment>} "отослать_п.")];
+
+<while> ::= "взбалтывать пока", "(", <expr>, ")", (<statment> | "позвать_повара" {<statment>} "отослать_п.");
+
+<funct_call> ::= "из", <function_name>, "(", [<arguments>], ")";
+
+<func_defenition> ::= "инструкция к", <function_name>'('<arguments>')',
+		      "позвать повара",
+				<expression>,
+				[на_блюдечко, id | <func_call>';'],
+		      "отослать_повара";
+
+<sqrt> ::= "sqrt(", <justexpression> | func";
+
+
+
+<output> ::= "наСтол", <term>, ';' ;
+<input> ::= "затариться", <id>, ';' ;
+
+<atom> ::=["очистить от"], <id> | <const> | <function_call>
+
+<arguments> ::= <id> | <func_call>, {"," <id> | <func_call>};
+
+end of statements:
+
+ВЫРУБИТЬ МУЗОН!
+отослать повара
+
