@@ -1,51 +1,37 @@
-//no types
-//automatic declaration
-// очистить_от or minus can be on the first place, so modify  <expr> or <id>
+This is the grammar of "the cooking programming language" with russian commands.
+It is not complete but gives a picture of the structure of the language.
 
-<program>    ::= "Рецепт, '"', <name of programm>, '"', [<premain>], <main>;
+<programm> ::= "Рецепт, '"', <name of programm>, '"', [<premain>], <main>;
 
 <premain> ::= [<assign> ';'], "Порядок приготовления:", [<func_defenition>+];
 
-<main> ::= "ВРУБИТЬ МУЗОН!", {<statment>},
+<main> ::= "ВРУБИТЬ МУЗОН!", {<statment>+},
            "ВЫРУБИТЬ МУЗОН!", "Время приготовления" <const> "мин";
 
-<statements> ::= {<statment>}
-
 <statement> ::= <if_stmt> | <while_stmt> | <expr>';' | <output> | <input>
-                <return> |<assign>;
+                <return>  | <assign>;
 
-<return> ::= "наТарелку";
-<expr>     ::= <just expression>;
+<expr> ::= /*expression with operators +, -, =, etc.*/ ;
 
-<assign> ::= "ингридиенты:", <id>["="<just expression>]{,<id>["="<just expression>]},";";
-<term>     ::= <id> | <const> | <function_call>;
+<assign> ::= "ингридиенты:", <id> ["=" <just expression>] {',' <id>["=" <just expression>]}, ";";
 
-<if_stmt> ::= "дегустация", "(", <expr>, ")", (<statment> | "позвать_повара:" {<statment>} "отослать_п.")
-		["else",  (<statment> | "позвать_повара "{<statment>} "отослать_п.")];
+<if_stmt> ::= "дегустация", "(", <expr>, ")", (<statment> | "позвать повара" {<statment>} "отослать повара")
+		      ["else",  (<statment> | "позвать повара "{<statment>} "отослать повара")];
 
-<while> ::= "взбалтывать пока", "(", <expr>, ")", (<statment> | "позвать_повара" {<statment>} "отослать_п.");
+<while> ::= "взбалтывать пока", "(", <expr>, ")", (<statment> | "позвать повара" {<statment>} "отослать повара");
 
 <funct_call> ::= "из", <function_name>, "(", [<arguments>], ")";
 
 <func_defenition> ::= "инструкция к", <function_name>'('<arguments>')',
-		      "позвать повара",
-				<expression>,
-				[на_блюдечко, id | <func_call>';'],
-		      "отослать_повара";
-
-<sqrt> ::= "sqrt(", <justexpression> | func";
-
-
-
-<output> ::= "наСтол", <term>, ';' ;
-<input> ::= "затариться", <id>, ';' ;
-
-<atom> ::=["очистить от"], <id> | <const> | <function_call>
+		              "позвать повара",
+				        <expression>+,
+				      [<return>],
+		              "отослать_повара";
 
 <arguments> ::= <id> | <func_call>, {"," <id> | <func_call>};
 
-end of statements:
+<output> ::= "наСтол", <atom>, ';' ;
+<input> ::= "затариться", <id>, ';' ;
+<return> ::= "наТарелку <atom> ";
 
-ВЫРУБИТЬ МУЗОН!
-отослать повара
-
+<atom> ::=["очистить от"], <id> | <const> | <function_call>

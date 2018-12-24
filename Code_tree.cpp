@@ -4,12 +4,32 @@
 #include "stdio.h"
 #include "ctype.h"
 #include "string.h"
-//#define Check(a) strcpy(str,#a); Check1();
-//#define if_check(a, b) strcpy(str, #b), if_check1(a)
 
 
 namespace Tree_of_code
 {
+    Node* code_tree::Read(FILE* input)
+    {
+        assert(input != NULL);
+
+        fseek(input, 0, SEEK_END);
+        size_t buf_size = ftell(input);
+        rewind(input);
+
+        char* buf = new char[buf_size + 1];
+        memset(buf, '\0', buf_size);
+
+        fread(buf, sizeof(buf[0]), buf_size + 1, input);
+
+        ptr = buf;
+
+        Lexical_analyser();
+
+        root = get_Programm();
+
+        delete[] buf;
+        return root;
+    }
 
     Node* code_tree::get_Programm()
     {
@@ -82,39 +102,35 @@ namespace Tree_of_code
 
     Node *code_tree::get_main()
     {
-        Check("ВРУБИТЬ"); Check("МУЗОН"); Check ("!");
+        Check("ВРУБИТЬ");  Check("МУЗОН"); Check("!");
 
         Node* main = get_statements();
 
         Check("ВЫРУБИТЬ"); Check("МУЗОН"); Check("!");
 
-        Check("Время");  Check("приготовления");
-        index++;
+        Check("Время");    Check("приготовления");
+
+        index++; // passes by a number
+
         Check("мин");
+
         return main;
     }
 
     Node *code_tree::get_statements()
     {
-
         Node* stmt = nullptr;
         if (!end_of_stmt())
             stmt = get_statement();
 
-        while(!end_of_stmt())
-        {
-
+        while (!end_of_stmt())
             stmt = CreateNode(GATHER, GATHER, stmt, get_statement());
-
-        }
-
 
         return stmt;
     }
 
     Node *code_tree::get_statement()
     {
-
         Node* stmt = nullptr;
 
         if (if_check(code[index], "дегустация"))
@@ -134,26 +150,23 @@ namespace Tree_of_code
         if (if_check(code[index], "наТарелку"))
             stmt = get_return();
         else
-         if (if_check(code[index], "ингридиенты"))
+        if (if_check(code[index], "ингридиенты"))
             stmt = get_assign();
-         else
+        else
         {
-
             stmt = get_E();
             Check(";");
         }
-
 
         return stmt;
     }
 
     Node *code_tree::get_return()
     {
-
         Node* ret = code[index];
         index++;
 
-        ret->type = command;
+        ret->type  = command;
         ret->value = return_cmd;
         strcpy(ret->name, "return");
 
@@ -162,15 +175,14 @@ namespace Tree_of_code
         Check(";");
         ret->right = term;
 
-
         return ret;
     }
 
     Node *code_tree::get_input()
     {
-        Node* in = code[index];
+        Node* in  = code[index];
         index++;
-        in->type = command;
+        in->type  = command;
         in->value = in_cmd;
         strcpy(in->name, "input");
 
@@ -184,9 +196,9 @@ namespace Tree_of_code
 
     Node *code_tree::get_output()
     {
-        Node* out = code[index];
+        Node* out  = code[index];
         index++;
-        out->type = command;
+        out->type  = command;
         out->value = out_cmd;
         strcpy(out->name, "output");
 
@@ -203,7 +215,7 @@ namespace Tree_of_code
         Node* while_stmt = code[index];
         index += 2;
 
-        while_stmt->type = command;
+        while_stmt->type  = command;
         while_stmt->value = while_cmd;
         strcpy(while_stmt->name, "while");
 
@@ -214,7 +226,7 @@ namespace Tree_of_code
         Check(")");
 
         while_stmt->right = condit;
-        while_stmt->left = Block_or_one();
+        while_stmt->left  = Block_or_one();
 
         return while_stmt;
     }
@@ -242,10 +254,7 @@ namespace Tree_of_code
             body = block;
         }
         else
-            {
-
-            body = get_statement();}
-
+            body = get_statement();
 
         return body;
     }
@@ -256,7 +265,7 @@ namespace Tree_of_code
         Node* ifstmt = code[index];
         index++;
 
-        ifstmt->type = command;
+        ifstmt->type  = command;
         ifstmt->value = if_cmd;
         strcpy(ifstmt->name, "IF");
 
@@ -267,16 +276,14 @@ namespace Tree_of_code
         Check(")");
 
         ifstmt->right = condit;
-        ifstmt->left = Block_or_one();
+        ifstmt->left  = Block_or_one();
 
 
         if (if_check(code[index], "невкусно"))
         {
-
             index++;
             ifstmt = CreateNode(command, IFELSE, ifstmt, Block_or_one());
             strcpy(ifstmt->name, "IFELSE");
-
         }
 
         return ifstmt;
@@ -284,25 +291,17 @@ namespace Tree_of_code
 
     bool code_tree::end_of_stmt()
     {
-
-
         if (code[index] != nullptr && code[index + 1] != nullptr)
             if (if_check(code[index], "отослать") &&
                 if_check(code[index + 1], "повара"))
-            {
-
-                //index += 2;
                 return true;
-            }
+
             else
             if (code[index + 2] != nullptr &&
                 if_check(code[index], "ВЫРУБИТЬ") &&
                 if_check(code[index + 1], "МУЗОН") &&
                 if_check(code[index + 2], "!"))
-            {
-               // index += 3;
                 return true;
-            }
 
         return false;
     }
@@ -361,7 +360,7 @@ namespace Tree_of_code
             assign = Unite(OP, unode, assign, get_E());
         }
 
-        while(if_check(code[index], ","))
+        while (if_check(code[index], ","))
         {
             index++;
 
@@ -408,16 +407,13 @@ namespace Tree_of_code
             assert(0);
         }
 
-
         index++;
-
         return newvar;
     }
 
 
     Node* code_tree::get_E()
     {
-
         Node* node = get_E2();
 
         while (if_check(code[index], "это") || if_check(code[index], "следует"))
@@ -438,6 +434,7 @@ namespace Tree_of_code
 
             node = Unite(OP, unode, node, node2);
         }
+
         return node;
     }
 
@@ -445,16 +442,14 @@ namespace Tree_of_code
     {
         Node* node = get_E3();
 
-        bool more = if_check(code[index], "вкуснее");
-        bool less = if_check(code[index], "горче");
-        bool equal = if_check(code[index], "на вкус как");
+        bool more     = if_check(code[index], "вкуснее");
+        bool less     = if_check(code[index], "горче");
+        bool equal    = if_check(code[index], "на вкус как");
         bool notequal = if_check(code[index], "не сочетается с");
 
         while (more || less || equal || notequal)
         {
             Node* unode = code[index];
-
-
             index ++;
 
             Node* node2 = get_E3();
@@ -483,12 +478,11 @@ namespace Tree_of_code
                 node = Unite(OP, unode, node, node2);
             }
 
-            more = if_check(code[index], "вкуснее");
-            less = if_check(code[index], "горче");
-            equal = if_check(code[index], "на вкус как");
+            more     = if_check(code[index], "вкуснее");
+            less     = if_check(code[index], "горче");
+            equal    = if_check(code[index], "на вкус как");
             notequal = if_check(code[index], "не сочетается с");
         }
-
 
         return node;
     }
@@ -497,13 +491,12 @@ namespace Tree_of_code
     {
         Node* node = get_T();
 
-        bool ADD = if_check(code[index], "смешать") && if_check(code[index + 1], "с");
+        bool ADD = if_check(code[index], "смешать")  && if_check(code[index + 1], "с");
 
         bool SUB = if_check(code[index], "очистить") && if_check(code[index + 1], "от");
 
         while (ADD || SUB)
         {
-
             Node* unode = code[index];
 
             index += 2;
@@ -520,9 +513,10 @@ namespace Tree_of_code
                 node = Unite(OP, unode, node, node2);
             }
 
-            ADD = if_check(code[index], "смешать") && if_check(code[index + 1], "c");
+            ADD = if_check(code[index], "смешать")  && if_check(code[index + 1], "c");
             SUB = if_check(code[index], "очистить") && if_check(code[index + 1], "от");
         }
+
         return node;
     }
 
@@ -530,7 +524,7 @@ namespace Tree_of_code
     {
         Node* node = get_SQRT();
 
-        bool MUL = if_check(code[index], "запечь") && if_check(code[index + 1], "с");
+        bool MUL = if_check(code[index], "запечь")   && if_check(code[index + 1], "с");
         bool DIV = if_check(code[index], "пожарить") && if_check(code[index + 1], "с");
 
         while (MUL || DIV)
@@ -550,7 +544,7 @@ namespace Tree_of_code
                 node = Unite(OP, unode, node, node2);
             }
 
-            MUL = if_check(code[index], "запечь") && if_check(code[index + 1], "с");
+            MUL = if_check(code[index], "запечь")   && if_check(code[index + 1], "с");
             DIV = if_check(code[index], "пожарить") && if_check(code[index + 1], "с");
         }
 
@@ -564,7 +558,7 @@ namespace Tree_of_code
         if (if_check(code[index], "посолить"))
         {
             node = code[index];
-            node->type = OP;
+            node->type  = OP;
             node->value = op_sqrt;
             index++;
 
@@ -584,17 +578,16 @@ namespace Tree_of_code
 
         if (if_check(code[index], "очистить") && if_check(code[index + 1], "от"))
         {
+            index += 2;
 
-                index += 2;
+            Node* minus  = new Node;
+            minus->type  = CONST;
+            minus->value = -1;
 
-                Node* minus = new Node;
-                minus->type = CONST;
-                minus->value = -1;
+            node = get_SQRT();
+            node = CreateNode(OP, mul, minus, node);
 
-                node = get_SQRT();
-                node = CreateNode(OP, mul, minus, node);
-
-            }
+        }
         else
             node = get_P2();
 
@@ -603,7 +596,6 @@ namespace Tree_of_code
 
     Node* code_tree::get_P2()
     {
-
         if (if_check(code[index], "("))
         {
             index++;
@@ -611,7 +603,6 @@ namespace Tree_of_code
             Node* node = get_E();
 
             Check(")");
-
             return node;
         }
 
@@ -636,7 +627,6 @@ namespace Tree_of_code
         {
             if (!strcmp(code[index]->name, "из"))
                 atom = func_call();
-
             else
             if (not_cmd())
             {
@@ -645,11 +635,9 @@ namespace Tree_of_code
                 index++;
             }
         }
-
         else
         if (code[index]->type == CONST)
         {
-
             atom = code[index];
             index++;
         }
@@ -710,14 +698,13 @@ namespace Tree_of_code
         {
             Node *arguments = get_E();
 
-
-            while(if_check(code[index], ","))
+            while (if_check(code[index], ","))
             {
                 Node* unode = code[index];
                 index++;
 
-                unode->type = GATHER;
-                unode->value= GATHER;
+                unode->type  = GATHER;
+                unode->value = GATHER;
                 strcpy(unode->name, "GATHER");
 
                 arguments = Unite(GATHER, unode, arguments, get_E());
@@ -768,6 +755,7 @@ namespace Tree_of_code
         if (strcmp(code[index]->name, str))
         {
             printf("syntax mistake in the %d line!\n", code[index]->line);
+
             if (code[index]->type == CONST)
                 printf("'%s' is expected, %lg was found.\n", str, code[index]->value);
             else
@@ -801,39 +789,7 @@ namespace Tree_of_code
         return newNode;
     }
 
-    Node* code_tree::Read(FILE* input)
-    {
-        assert(input != NULL);
 
-        fseek(input, 0, SEEK_END);
-        size_t buf_size = ftell(input);
-        rewind(input);
-
-        char* buf = new char[buf_size + 1];
-        memset(buf, '\0', buf_size);
-
-        fread(buf, sizeof(buf[0]), buf_size + 1, input);
-
-        ptr = buf;
-
-        Lexical_analyser();
-
-//        int sz = code.size();
-//        printf("vec size = %d", code.size());
-//
-//        for (int i = 0; i < sz - 1; i++)
-//        {
-//            if (code[i]->type == CONST)
-//                printf("%lg\n", code[i]->value);
-//            else
-//                printf("%s\n", code[i]->name);
-//        }
-
-        root = get_Programm();
-
-        delete[] buf;
-        return root;
-    }
 
     bool is_RUSalpha(char* ptr)
     {
@@ -864,7 +820,6 @@ namespace Tree_of_code
     int code_tree::read_name(Node* node)
     {
         int i = 0;
-
         bool rus = false;
 
         while((rus = is_RUSalpha(ptr)) || isalnum(*ptr))
@@ -886,7 +841,6 @@ namespace Tree_of_code
 
         node->name[i] = '\0';
 
-        //printf("name-> %s\n", node->name);
         char str1[CMD_MAXSIZE] = "";
         char str2[CMD_MAXSIZE] = "";
 
@@ -926,13 +880,11 @@ namespace Tree_of_code
 
     int code_tree::Lexical_analyser()
     {
-
-        while(*ptr != '\0')
+        while (*ptr != '\0')
         {
-
             skip_space();
-            //if name
 
+            //if name
             if (*ptr != '\0')
             {
                 if (is_RUSalpha(ptr) || isalpha(*ptr))
@@ -945,8 +897,9 @@ namespace Tree_of_code
 
                     read_name(newNode);
                     code.push_back(newNode);
-                } else
-                    //if const
+
+                }
+                else //if const
                 if ('0' <= *ptr && *ptr <= '9')
                 {
                     Node *newNode = new Node;
@@ -956,10 +909,9 @@ namespace Tree_of_code
 
                     read_num(newNode);
                     code.push_back(newNode);
-                } else
-                    //if punct
+                }
+                else //if punct
                 {
-
                     Node *newNode = new Node;
                     newNode->type = punct;
 
@@ -973,7 +925,6 @@ namespace Tree_of_code
         }
 
         code.push_back(nullptr);
-
         return 0;
     }
 
@@ -1005,7 +956,7 @@ namespace Tree_of_code
         assert(out != NULL);
         assert(root!=nullptr);
 
-#define fillcolor "#FFEBCD"
+        #define fillcolor "#FFEBCD"
         fprintf(out,"digraph G {\nnode[shape=ellipse fontsize =15 style=%cfilled%c fillcolor=%c" fillcolor "%c]\n",
                 '"', '"', '"', '"');
 
@@ -1033,7 +984,6 @@ namespace Tree_of_code
         {
             ++*num;
             fprintf(out, "node%d->node%d;\n", cur_num, *num);
-
             Dotwrite_elems(elem->left, num, out);
         }
 

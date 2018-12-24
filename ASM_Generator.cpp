@@ -2,11 +2,6 @@
 #include "assert.h"
 #include "string.h"
 
-//todo
-// generate '==','>','<', '!=' only in if and while commands
-//todo
-// function doesnt leave anything in stack
-// without checking
 namespace ASM_Gen
 {
     int Generator::Generate_asm(Tree_of_code::Node *root, FILE *output)
@@ -22,7 +17,8 @@ namespace ASM_Gen
 
         if (premain != nullptr && premain->left != nullptr)
         {
-            fprintf(output, "//cx is an address which RAM is free after\npush 0\npop cx\n\n");
+            fprintf(output, "//cx is an address which RAM is free after"
+                            "\npush 0\npop cx\n\n");
 
             G = count_globals(premain->left->right);
 
@@ -33,10 +29,13 @@ namespace ASM_Gen
 
         if (main != nullptr)
         {
-            fprintf(output, "\npush %d\npop cx\n\n//___main___//\n", G);
+            fprintf(output, "\npush %d\npop cx\n"
+                            "\n//___main___//\n", G);
+
             gener_code(main, output);
 
-            fprintf(output, "end\n\n//___end_of_main___//\n");
+            fprintf(output, "end\n"
+                            "\n//___end_of_main___//\n");
             TID.resize(G);
         }
 
@@ -59,7 +58,6 @@ namespace ASM_Gen
     {
         assert(node != nullptr);
 
-
         if (node->type == Tree_of_code::GATHER)
         {
             gener_declar(node->left, out);
@@ -72,7 +70,6 @@ namespace ASM_Gen
         else // there is '='
         {
             Tree_of_code::Node* var = node->left;
-
 
             add_id(var);
 
@@ -169,7 +166,6 @@ namespace ASM_Gen
 
             case Tree_of_code::fcall:
                 gener_fcall(node, out);
-
         }
 
         return 0;
@@ -220,19 +216,25 @@ namespace ASM_Gen
         {
             case Tree_of_code::if_cmd:
                 fprintf(out, "\n//if-expression//\n");
+
                 gener_if_cmd(node, out);
+
                 fprintf(out, "//end of if-expression//\n");
                 break;
 
             case Tree_of_code::IFELSE:
                 fprintf(out, "\n//if/else-expression//\n");
+
                 gener_ifelse_cmd(node, out);
+
                 fprintf(out, "//end of if/else-expression//\n");
                 break;
 
             case Tree_of_code::while_cmd:
                 fprintf(out, "\n//while-expression//\n");
+
                 gener_while_cmd(node, out);
+
                 fprintf(out, "//end of while-expression//\n");
                 break;
 
@@ -249,6 +251,7 @@ namespace ASM_Gen
 
             case Tree_of_code::return_cmd:
                 gener_code(node->right, out);
+
                 fprintf(out,"\nret\n");
                 break;
 
@@ -290,7 +293,6 @@ namespace ASM_Gen
 
     int Generator::gener_while_cmd(Tree_of_code::Node *node, FILE *out)
     {
-
         fprintf(out, "label_%d:\n", label);
 
         int cur_label = label++;
@@ -302,7 +304,9 @@ namespace ASM_Gen
         fprintf(out, "\n//(condition)//\n");
 
         label = cur_label;
+
         gener_condit(node->right, out);
+
         fprintf(out, "//(condition)//\n");
 
         label = nextl;
@@ -315,6 +319,7 @@ namespace ASM_Gen
         Tree_of_code::Node* if_node = node->left;
 
         fprintf(out, "\n//(condition)//\n");
+
         gener_condit(if_node->right, out);
 
         int cur_label1 = label++;
@@ -339,6 +344,7 @@ namespace ASM_Gen
     int Generator::gener_if_cmd(Tree_of_code::Node *node, FILE *out)
     {
         fprintf(out, "\n//(condition)//\n");
+
         gener_condit(node->right, out);
 
         int cur_label = label++;
@@ -476,6 +482,7 @@ namespace ASM_Gen
                 put_in_stack(node->left, out);
             }
             break;
+
             case Tree_of_code::VAR:
                 write_var(node, out);
                 fprintf(out, "push ax\n");

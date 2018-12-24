@@ -1,10 +1,8 @@
 #include "stdio.h"
 #include "assert.h"
+
 #include "Code_tree.h"
 #include "ASM_Generator.h"
-#include "ctype.h"
-#include "string.h"
-
 
 int main()
 {
